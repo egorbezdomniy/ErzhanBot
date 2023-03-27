@@ -2,6 +2,10 @@ import telebot
 from telebot import types
 import requests
 
+photos = {
+    'egorbezdomniy': 'AgACAgIAAxkBAAID6WQgrbvxNRvm5gZ2M7cwIvGu2buDAAJPzjEbvcoISWsZ3UWHq21gAQADAgADeAADLwQ',
+}
+
 response = requests.get("http://127.0.0.1:8000/api/liquids").json()
 
 
@@ -9,7 +13,9 @@ greetings = ['hello', 'hi', 'привет', 'здравствуй', 'здрав�
 
 swears = ['хуй', 'блять', 'бля', 'залупа', 'пизд']
 
-bot = telebot.TeleBot('6139391767:AAHgSOWxdNako0LSrUImOp5Z2P210jHhDQs')
+token = '6139391767:AAHgSOWxdNako0LSrUImOp5Z2P210jHhDQs'
+
+bot = telebot.TeleBot(token)
 
 
 @bot.message_handler(commands=['start'])
@@ -24,6 +30,15 @@ def start(message):
 
     markup.add(assortment, links, courier)
     bot.send_message(message.chat.id, msg, parse_mode='html', reply_markup=markup)
+
+@bot.message_handler(content_types=["photo"])
+
+def handle_photo(message):
+
+    photo_id=message.photo[2].file_id
+
+    file_info = bot.get_file(photo_id)
+    bot.send_message(message.chat.id, photo_id)
 
 
 @bot.message_handler(commands=['help'])
@@ -90,10 +105,13 @@ def get_user_text(message):
     elif message.text == 'Жидкости':
 
         for i in response:
-            msg = f'Марка: {i["brand"]}\n' \
-                  f'Имя: {i["name"]}\n' \
 
-            bot.send_message(message.chat.id, msg, parse_mode='html')
+            if i['ammount'] > 0:
+                bot.send_photo(message.chat.id, photo=photos[i["name"]])
+                msg = f'Бренд: {i["brand"]}\nИмя: {i["name"]}\nЦена: {i["price"]}'
+
+
+                bot.send_message(message.chat.id, msg, parse_mode='html')
         return 0
 
 

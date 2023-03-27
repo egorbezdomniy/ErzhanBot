@@ -8,6 +8,7 @@ class Liquid(models.Model):
     )
     brand = models.CharField(max_length=64, choices=CHOICES)
     name = models.CharField(max_length=64)
-
+    price = models.IntegerField()
+    ammount = models.IntegerField()
     def __str__(self) -> str:
         return self.name
