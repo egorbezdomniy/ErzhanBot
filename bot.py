@@ -3,10 +3,14 @@ from telebot import types
 import requests
 
 photos = {
-    'egorbezdomniy': 'AgACAgIAAxkBAAID6WQgrbvxNRvm5gZ2M7cwIvGu2buDAAJPzjEbvcoISWsZ3UWHq21gAQADAgADeAADLwQ',
+    'LiquidName': 'AgACAgIAAxkBAAID6WQgrbvxNRvm5gZ2M7cwIvGu2buDAAJPzjEbvcoISWsZ3UWHq21gAQADAgADeAADLwQ',
+    'PodName': 'AgACAgIAAxkBAAID6WQgrbvxNRvm5gZ2M7cwIvGu2buDAAJPzjEbvcoISWsZ3UWHq21gAQADAgADeAADLwQ',
+    'SnusName': 'AgACAgIAAxkBAAID6WQgrbvxNRvm5gZ2M7cwIvGu2buDAAJPzjEbvcoISWsZ3UWHq21gAQADAgADeAADLwQ',
+    'SingleUseName': 'AgACAgIAAxkBAAID6WQgrbvxNRvm5gZ2M7cwIvGu2buDAAJPzjEbvcoISWsZ3UWHq21gAQADAgADeAADLwQ',
+    'ConsName': 'AgACAgIAAxkBAAID6WQgrbvxNRvm5gZ2M7cwIvGu2buDAAJPzjEbvcoISWsZ3UWHq21gAQADAgADeAADLwQ',
 }
 
-response = requests.get("http://127.0.0.1:8000/api/liquids").json()
+
 
 
 greetings = ['hello', 'hi', 'привет', 'здравствуй', 'здравствуйте']
@@ -83,11 +87,11 @@ def get_user_text(message):
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
         liquids = types.KeyboardButton('Жидкости')
         pods = types.KeyboardButton('Поды')
-        consumables = types.KeyboardButton('Разходники/Одноразки')
+        consumables = types.KeyboardButton('Разходники')
         snus = types.KeyboardButton('Снюс')
-        used = types.KeyboardButton('б/у')
+        single_use = types.KeyboardButton('Одноразки')
         back = types.KeyboardButton('Назад')
-        markup.add(liquids, pods, consumables, snus, used, back)
+        markup.add(liquids, pods, consumables, snus, single_use, back)
         bot.send_message(message.chat.id, msg, parse_mode='html', reply_markup=markup)
         return 0
 
@@ -103,18 +107,62 @@ def get_user_text(message):
         return 0
 
     elif message.text == 'Жидкости':
-
+        response = requests.get("http://127.0.0.1:8000/api/liquids").json()
         for i in response:
 
-            if i['ammount'] > 0:
+            if i['amount'] > 0:
                 bot.send_photo(message.chat.id, photo=photos[i["name"]])
                 msg = f'Бренд: {i["brand"]}\nИмя: {i["name"]}\nЦена: {i["price"]}'
 
 
                 bot.send_message(message.chat.id, msg, parse_mode='html')
         return 0
+    elif message.text == 'Поды':
+        response = requests.get("http://127.0.0.1:8000/api/pods").json()
+        for i in response:
+
+            if i['amount'] > 0:
+                bot.send_photo(message.chat.id, photo=photos[i["name"]])
+                msg = f'Бренд: {i["brand"]}\nИмя: {i["name"]}\nЦена: {i["price"]}'
 
 
+                bot.send_message(message.chat.id, msg, parse_mode='html')
+        return 0
+    elif message.text == 'Снюс':
+        response = requests.get("http://127.0.0.1:8000/api/snus").json()
+        for i in response:
+
+            if i['amount'] > 0:
+                bot.send_photo(message.chat.id, photo=photos[i["name"]])
+                msg = f'Бренд: {i["brand"]}\nИмя: {i["name"]}\nЦена: {i["price"]}'
+
+
+                bot.send_message(message.chat.id, msg, parse_mode='html')
+        return 0
+    elif message.text == 'Одноразки':
+        response = requests.get("http://127.0.0.1:8000/api/single_uses").json()
+        for i in response:
+
+            if i['amount'] > 0:
+                bot.send_photo(message.chat.id, photo=photos[i["name"]])
+                msg = f'Бренд: {i["brand"]}\nИмя: {i["name"]}\nЦена: {i["price"]}'
+
+
+                bot.send_message(message.chat.id, msg, parse_mode='html')
+        return 0
+    
+    elif message.text == 'Разходники':
+        response = requests.get("http://127.0.0.1:8000/api/consumables").json()
+        for i in response:
+
+            if i['amount'] > 0:
+                bot.send_photo(message.chat.id, photo=photos[i["name"]])
+                msg = f'Бренд: {i["brand"]}\nИмя: {i["name"]}\nЦена: {i["price"]}'
+
+
+                bot.send_message(message.chat.id, msg, parse_mode='html')
+        return 0
+    
 
     elif msg_text in greetings:
         msg = '👋'
