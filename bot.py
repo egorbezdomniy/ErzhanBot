@@ -1,6 +1,7 @@
 import telebot
 from telebot import types
 import requests
+import json
 
 photos = {
     'LiquidName': 'AgACAgIAAxkBAAID6WQgrbvxNRvm5gZ2M7cwIvGu2buDAAJPzjEbvcoISWsZ3UWHq21gAQADAgADeAADLwQ',
@@ -76,8 +77,7 @@ def get_user_text(message):
     elif message.text == 'Курьеры':
         markup = types.InlineKeyboardMarkup()
         vlad = types.InlineKeyboardButton('Основной курьер', url='https://t.me/stupinoo')
-        kochan = types.InlineKeyboardButton('Запасной курьер', url='https://t.me/+79857114336')
-        markup.add(vlad, kochan)
+        markup.add(vlad)
         msg = '<b>Курьеры:</b>'
         bot.send_message(message.chat.id, msg, parse_mode='html', reply_markup=markup)
         return 0
@@ -107,60 +107,123 @@ def get_user_text(message):
         return 0
 
     elif message.text == 'Жидкости':
+        
         response = requests.get("http://127.0.0.1:8000/api/liquids").json()
-        for i in response:
+        response_brand = requests.get("http://127.0.0.1:8000/api/liquid-brands").json()
+        for brand in response_brand:
+            # отправка названия бренда
+            bot.send_message(message.chat.id, f"Жидкости бренда {brand['name']}:", parse_mode='html')
+            # отправка фото
+            photo_url = brand['image']
+            photo_response = requests.get(photo_url)
+            photo = photo_response.content
+            bot.send_photo(message.chat.id, photo)
+            bot.send_message(message.chat.id, 'Есть в наличии:', parse_mode='html')
+            is_there = 0
+            for liquid in response:
+                if liquid['brand']['name'] == brand['name']:
+                    if liquid['amount'] > 0:
+                        is_there += 1
+                        msg = f'{liquid["name"]}\nЦена: {liquid["price"]} ₽'
 
-            if i['amount'] > 0:
-                bot.send_photo(message.chat.id, photo=photos[i["name"]])
-                msg = f'Бренд: {i["brand"]}\nИмя: {i["name"]}\nЦена: {i["price"]}'
 
+                        bot.send_message(message.chat.id, msg, parse_mode='html')
+            if is_there == 0:
+                bot.send_message(message.chat.id, 'На данный момент в наличии экземпляров нет', parse_mode='html')
 
-                bot.send_message(message.chat.id, msg, parse_mode='html')
         return 0
     elif message.text == 'Поды':
-        response = requests.get("http://127.0.0.1:8000/api/pods").json()
-        for i in response:
+        response = requests.get("http://127.0.0.1:8000/api/pods/").json()
+        response_brand = requests.get("http://127.0.0.1:8000/api/pod-brands/").json()
+        for brand in response_brand:
+            # отправка названия бренда
+            bot.send_message(message.chat.id, f"Поды бренда {brand['name']}:", parse_mode='html')
+            # отправка фото
+            photo_url = brand['image']
+            photo_response = requests.get(photo_url)
+            photo = photo_response.content
+            bot.send_photo(message.chat.id, photo)
+            bot.send_message(message.chat.id, 'Есть в наличии:', parse_mode='html')
+            is_there = 0
+            for pod in response:
+                if pod['brand']['name'] == brand['name']:
+                    if pod['amount'] > 0:
+                        is_there += 1
+                        msg = f'{pod["name"]}\nЦена: {pod["price"]} ₽'
 
-            if i['amount'] > 0:
-                bot.send_photo(message.chat.id, photo=photos[i["name"]])
-                msg = f'Бренд: {i["brand"]}\nИмя: {i["name"]}\nЦена: {i["price"]}'
-
-
-                bot.send_message(message.chat.id, msg, parse_mode='html')
+                        bot.send_message(message.chat.id, msg, parse_mode='html')
+            if is_there == 0:
+                bot.send_message(message.chat.id, 'На данный момент в наличии экземпляров нет', parse_mode='html')
         return 0
     elif message.text == 'Снюс':
-        response = requests.get("http://127.0.0.1:8000/api/snus").json()
-        for i in response:
+        response = requests.get("http://127.0.0.1:8000/api/snuses/").json()
+        response_brand = requests.get("http://127.0.0.1:8000/api/snus-brands/").json()
+        for brand in response_brand:
+            # отправка названия бренда
+            bot.send_message(message.chat.id, f"Снюс бренда {brand['name']}:", parse_mode='html')
+            # отправка фото
+            photo_url = brand['image']
+            photo_response = requests.get(photo_url)
+            photo = photo_response.content
+            bot.send_photo(message.chat.id, photo)
+            bot.send_message(message.chat.id, 'Есть в наличии:', parse_mode='html')
+            is_there = 0
+            for snus in response:
+                if snus['brand']['name'] == brand['name']:
+                    if snus['amount'] > 0:
+                        is_there += 1
+                        msg = f'{snus["name"]}\nЦена: {snus["price"]} ₽'
 
-            if i['amount'] > 0:
-                bot.send_photo(message.chat.id, photo=photos[i["name"]])
-                msg = f'Бренд: {i["brand"]}\nИмя: {i["name"]}\nЦена: {i["price"]}'
-
-
-                bot.send_message(message.chat.id, msg, parse_mode='html')
+                        bot.send_message(message.chat.id, msg, parse_mode='html')
+            if is_there == 0:
+                bot.send_message(message.chat.id, 'На данный момент в наличии экземпляров нет', parse_mode='html')
         return 0
     elif message.text == 'Одноразки':
-        response = requests.get("http://127.0.0.1:8000/api/single_uses").json()
-        for i in response:
+        response = requests.get("http://127.0.0.1:8000/api/singles/").json()
+        response_brand = requests.get("http://127.0.0.1:8000/api/single-brands/").json()
+        for brand in response_brand:
+            # отправка названия бренда
+            bot.send_message(message.chat.id, f"Одноразки бренда {brand['name']}:", parse_mode='html')
+            # отправка фото
+            photo_url = brand['image']
+            photo_response = requests.get(photo_url)
+            photo = photo_response.content
+            bot.send_photo(message.chat.id, photo)
+            bot.send_message(message.chat.id, 'Есть в наличии:', parse_mode='html')
+            is_there = 0
+            for single in response:
+                if single['brand']['name'] == brand['name']:
+                    if single['amount'] > 0:
+                        is_there += 1
+                        msg = f'{single["name"]}\nЦена: {single["price"]} ₽'
 
-            if i['amount'] > 0:
-                bot.send_photo(message.chat.id, photo=photos[i["name"]])
-                msg = f'Бренд: {i["brand"]}\nИмя: {i["name"]}\nЦена: {i["price"]}'
-
-
-                bot.send_message(message.chat.id, msg, parse_mode='html')
+                        bot.send_message(message.chat.id, msg, parse_mode='html')
+            if is_there == 0:
+                bot.send_message(message.chat.id, 'На данный момент в наличии экземпляров нет', parse_mode='html')
         return 0
     
     elif message.text == 'Разходники':
-        response = requests.get("http://127.0.0.1:8000/api/consumables").json()
-        for i in response:
+        response = requests.get("http://127.0.0.1:8000/api/consumables/").json()
+        response_brand = requests.get("http://127.0.0.1:8000/api/consumables-brands/").json()
+        for brand in response_brand:
+            # отправка названия бренда
+            bot.send_message(message.chat.id, f"Расходники бренда {brand['name']}:", parse_mode='html')
+            # отправка фото
+            photo_url = brand['image']
+            photo_response = requests.get(photo_url)
+            photo = photo_response.content
+            bot.send_photo(message.chat.id, photo)
+            bot.send_message(message.chat.id, 'Есть в наличии:', parse_mode='html')
+            is_there = 0
+            for consumable in response:
+                if consumable['brand']['name'] == brand['name']:
+                    if consumable['amount'] > 0:
+                        is_there += 1
+                        msg = f'{consumable["name"]}\nЦена: {consumable["price"]} ₽'
 
-            if i['amount'] > 0:
-                bot.send_photo(message.chat.id, photo=photos[i["name"]])
-                msg = f'Бренд: {i["brand"]}\nИмя: {i["name"]}\nЦена: {i["price"]}'
-
-
-                bot.send_message(message.chat.id, msg, parse_mode='html')
+                        bot.send_message(message.chat.id, msg, parse_mode='html')
+            if is_there == 0:
+                bot.send_message(message.chat.id, 'На данный момент в наличии экземпляров нет', parse_mode='html')
         return 0
     
 
